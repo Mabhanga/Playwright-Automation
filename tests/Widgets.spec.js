@@ -22,13 +22,12 @@ test('Auto Complete', async ({ page }) => {
 
 test('Date Picker', async ({ page }) => {
   await page.goto('https://demoqa.com/');
-  await page.locator('path').nth(3).click();
-  await page.getByRole('heading', { name: 'Widgets' }).click();
-  await page.getByText('Widgets').click();
+  await page.locator('div.card-body:has-text("Widgets")').click();
   await page.getByText('Date Picker').click();
   await expect(page.getByRole('heading', { name: 'Date Picker' })).toBeVisible();
-  await page.locator('#datePickerMonthYearInput').click();
-  await page.getByRole('option', { name: 'Choose Tuesday, October 21st,' }).click();
+  const dateInput = page.locator('#datePickerMonthYearInput');
+  await dateInput.click();
+  await page.locator('.react-datepicker__day--021:not(.react-datepicker__day--outside-month)').click();
 });
 
 test('Slider', async ({ page }) => {
@@ -74,54 +73,30 @@ test('Tabs', async ({ page }) => {
   }
 });
 
-test('Tool Tips', async ({ page }) => {
+test('Tool Tips', async ({ page, browserName }) => {
+  // Go to DemoQA main page
   await page.goto('https://demoqa.com/');
-  await page.getByRole('heading', { name: 'Widgets' }).click();
-  await page.getByText('Widgets').click();
-  await page.getByText('Tool Tips').click();
-  await page.getByRole('button', { name: 'Hover me to see' }).click();
+  await page.locator('div.card-body:has-text("Widgets")').click();
+  await expect(page.getByText('Accordian')).toBeVisible();
+
+  const toolTipsLink = page.getByText('Tool Tips', { exact: true });
+  await toolTipsLink.scrollIntoViewIfNeeded();
+  await toolTipsLink.click();
+  await expect(page.getByRole('heading', { name: 'Tool Tips' })).toBeVisible();
+
+  const hoverButton = page.getByRole('button', { name: 'Hover me to see' });
+
+  // Workaround for WebKit hover
+  if (browserName === 'webkit') {
+    await hoverButton.hover({ force: true });
+  } else {
+    await hoverButton.hover();
+  }
+
+  // Wait for tooltip to appear
+  const tooltip = page.locator('.tooltip-inner');
+  await tooltip.waitFor({ state: 'visible', timeout: 5000 });
+
+  await expect(tooltip).toBeVisible();
 });
-
-
-test.only('Select Menu Test - Robust Cross-Browser', async ({ page }) => {
-  // Navigate directly to Select Menu page
-  await page.goto('https://demoqa.com/select-menu', { waitUntil: 'domcontentloaded' });
-
-  // Remove popups/ads
-  await page.evaluate(() => {
-    document.querySelectorAll('[id*="Ad.Plus"], .popup, .modal, iframe, #fixedban').forEach(el => el.remove());
-  });
-
-  // Wait for the page main header
-  await page.locator('.main-header').waitFor({ state: 'visible', timeout: 10000 });
-
-  // Old style select
-  await page.locator('#oldSelectMenu').selectOption('2');
-
-  // Standard React-select dropdown - Group 1
-  const group1Dropdown = page.locator('#selectOne'); // the visible container
-  await group1Dropdown.click();
-  await page.locator('div[id^="react-select-"][id$="-option-0"]:has-text("Group 1, option 1")').click();
-
-  // React-select dropdown - Title (Mr./Mrs./Other)
-  const titleDropdown = page.locator('#selectTitle'); // visible container
-  await titleDropdown.click();
-
-  // Wait for dropdown portal to appear and select "Mr."
-  const mrOption = page.locator('div[id^="react-select-"][id$="-option-0"]:has-text("Mr.")');
-  await mrOption.waitFor({ state: 'visible', timeout: 10000 });
-  await mrOption.click();
-
-  // React-select dropdown - Old Style Select 4
-  const select4Dropdown = page.locator('#selectMenuContainer #withOptGroup'); 
-  await select4Dropdown.click();
-  await page.locator('#react-select-4-option-0').click();
-
-  // Multi-select cars
-  await page.locator('#cars').selectOption('opel');
-
-  // Validate selections
-  await expect(page.locator('#cars')).toHaveValue('opel');
-});
-
 

@@ -14,7 +14,7 @@ test('Practice Form', async ({ page }) => {
   await expect(page.locator('#example-modal-sizes-title-lg')).toBeVisible();
 });
 
-test.only('Browser Windows', async ({ page }) => {
+test('Browser Windows', async ({ page }) => {
   await page.goto('https://demoqa.com/');
   await page.getByText('Alerts, Frame & Windows', { exact: true }).click();
   await page.getByText('Browser Windows', { exact: true }).click();

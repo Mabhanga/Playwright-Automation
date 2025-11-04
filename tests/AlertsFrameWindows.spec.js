@@ -26,23 +26,34 @@ test('Browser Windows', async ({ page }) => {
 
 test('Alerts', async ({ page }) => {
   await page.goto('https://demoqa.com/alerts');
+  page.on('dialog', async dialog => {
+    if (dialog.type() === 'prompt') {
+      await dialog.accept('Testing input'); 
+    } else {
+      await dialog.dismiss();
+    }
+  });
 
   // Simple alert
-  page.once('dialog', dialog => dialog.dismiss());
-  await page.locator('#alertButton').click();
+  const alertBtn = page.locator('#alertButton');
+  await alertBtn.waitFor({ state: 'visible', timeout: 5000 });
+  await alertBtn.click();
 
-  // Timer alert (appears after 5 sec)
-  page.once('dialog', dialog => dialog.dismiss());
-  await page.locator('#timerAlertButton').click();
-  await page.waitForTimeout(6000); // wait for dialog to appear and be handled
+  // Timer alert (appears after a few seconds)
+  const timerAlertBtn = page.locator('#timerAlertButton');
+  await timerAlertBtn.waitFor({ state: 'visible', timeout: 5000 });
+  await timerAlertBtn.click();
+  await page.waitForEvent('dialog'); // wait until alert appears
 
   // Confirm alert
-  page.once('dialog', dialog => dialog.dismiss());
-  await page.locator('#confirmButton').click();
+  const confirmBtn = page.locator('#confirmButton');
+  await confirmBtn.waitFor({ state: 'visible', timeout: 5000 });
+  await confirmBtn.click();
 
   // Prompt alert
-  page.once('dialog', dialog => dialog.accept('Testing input'));
-  await page.locator('#promtButton').click();
+  const promptBtn = page.locator('#promtButton');
+  await promptBtn.waitFor({ state: 'visible', timeout: 5000 });
+  await promptBtn.click();
 });
 
 test('Nested Frames', async ({ page }) => {
@@ -52,7 +63,7 @@ test('Nested Frames', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Nested Frames' })).toBeVisible();
 });
 
-test.only('Modal Dialogs', async ({ page }) => {
+test('Modal Dialogs', async ({ page }) => {
   await page.goto('https://demoqa.com/');
   await page.getByText('Alerts, Frame & Windows', { exact: true }).click();
   await page.getByText('Modal Dialogs', { exact: true }).click();
