@@ -51,26 +51,20 @@ test('Progress Bar', async ({ page }) => {
 });
 
 test('Tabs', async ({ page }) => {
-  await page.goto('https://demoqa.com/');
-  await page.locator('.card-body:has-text("Widgets")').click();
-  await page.waitForSelector('.left-pannel');
-  await page.locator('span:has-text("Tabs")').scrollIntoViewIfNeeded();
-  await page.locator('span:has-text("Tabs")').click();
-  await page.waitForURL('**/tabs');
-  await expect(page.locator('#demo-tab-what')).toBeVisible();
-  await page.waitForSelector('.nav-tabs', { state: 'visible' });
-  const tabs = ['Origin', 'Use', 'What'];
+  await page.goto('https://demoqa.com/tabs');
+  await expect(page.getByRole('heading', { name: 'Tabs' })).toBeVisible();
 
-  for (const tab of tabs) {
-    const tabLocator = page.locator(`#demo-tab-${tab.toLowerCase()}`);
-    await tabLocator.scrollIntoViewIfNeeded();
-    await tabLocator.evaluate(node => node.click());
-    await page.waitForFunction(
-      id => document.querySelector(id)?.getAttribute('aria-hidden') === 'false',
-      `#demo-tabpane-${tab.toLowerCase()}`
-    );
-    await expect(page.locator(`#demo-tabpane-${tab.toLowerCase()}`)).toBeVisible();
-  }
+  // What tab
+  await page.locator('#demo-tab-what').click();
+  await expect(page.locator('#demo-tabpane-what')).toBeVisible();
+
+  // Origin tab
+  await page.locator('#demo-tab-origin').click();
+  await expect(page.locator('#demo-tabpane-origin')).toBeVisible();
+
+  // Use tab
+  await page.locator('#demo-tab-use').click();
+  await expect(page.locator('#demo-tabpane-use')).toBeVisible();
 });
 
 test('Tool Tips', async ({ page, browserName }) => {

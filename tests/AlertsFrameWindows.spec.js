@@ -34,41 +34,46 @@ test('Alerts', async ({ page }) => {
     }
   });
 
-  // Simple alert
   const alertBtn = page.locator('#alertButton');
   await alertBtn.waitFor({ state: 'visible', timeout: 5000 });
   await alertBtn.click();
 
-  // Timer alert (appears after a few seconds)
   const timerAlertBtn = page.locator('#timerAlertButton');
   await timerAlertBtn.waitFor({ state: 'visible', timeout: 5000 });
   await timerAlertBtn.click();
-  await page.waitForEvent('dialog'); // wait until alert appears
+  await page.waitForEvent('dialog');
 
-  // Confirm alert
   const confirmBtn = page.locator('#confirmButton');
   await confirmBtn.waitFor({ state: 'visible', timeout: 5000 });
   await confirmBtn.click();
 
-  // Prompt alert
   const promptBtn = page.locator('#promtButton');
   await promptBtn.waitFor({ state: 'visible', timeout: 5000 });
   await promptBtn.click();
 });
 
 test('Nested Frames', async ({ page }) => {
-  await page.goto('https://demoqa.com/');
-  await page.getByText('Alerts, Frame & Windows', { exact: true }).click();
-  await page.getByText('Nested Frames', { exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Nested Frames' })).toBeVisible();
+  await page.goto('https://demoqa.com/nestedframes');
+  
+  const parentFrame = page.frameLocator('#frame1');
+  await expect(parentFrame.locator('body')).toContainText('Parent frame');
+  
+  const childFrame = parentFrame.frameLocator('iframe');
+  await expect(childFrame.locator('body')).toContainText('Child Iframe');
 });
 
 test('Modal Dialogs', async ({ page }) => {
-  await page.goto('https://demoqa.com/');
-  await page.getByText('Alerts, Frame & Windows', { exact: true }).click();
-  await page.getByText('Modal Dialogs', { exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Modal Dialogs' })).toBeVisible();
+  await page.goto('https://demoqa.com/modal-dialogs');
+
+  // Small modal
+  await page.getByRole('button', { name: 'Small Modal' }).click();
+  await expect(page.locator('.modal-title')).toContainText('Small Modal');
+  await page.locator('#closeSmallModal').click();
+  await expect(page.locator('.modal-title')).not.toBeVisible();
+
+  // Large modal
+  await page.getByRole('button', { name: 'Large Modal' }).click();
+  await expect(page.locator('.modal-title')).toContainText('Large Modal');
+  await page.locator('#closeLargeModal').click();
+  await expect(page.locator('.modal-title')).not.toBeVisible();
 });
-
-
-
