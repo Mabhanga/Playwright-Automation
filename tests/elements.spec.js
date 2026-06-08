@@ -48,7 +48,7 @@ test('Buttons', async ({ page }) => {
 test('Links', async ({ page }) => {
   await page.goto('https://demoqa.com/links');
   const page1Promise = page.waitForEvent('popup');
-  await page.getByRole('link', { name: 'Home', exact: true }).click();
+  await page.locator('#simpleLink').click();
   const page1 = await page1Promise;
   await expect(page1).toHaveURL('https://demoqa.com/');
 });

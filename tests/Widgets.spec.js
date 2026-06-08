@@ -21,9 +21,7 @@ test('Auto Complete', async ({ page }) => {
 });
 
 test('Date Picker', async ({ page }) => {
-  await page.goto('https://demoqa.com/');
-  await page.locator('div.card-body:has-text("Widgets")').click();
-  await page.getByText('Date Picker').click();
+  await page.goto('https://demoqa.com/date-picker');
   await expect(page.getByRole('heading', { name: 'Date Picker' })).toBeVisible();
   const dateInput = page.locator('#datePickerMonthYearInput');
   await dateInput.click();
@@ -31,11 +29,7 @@ test('Date Picker', async ({ page }) => {
 });
 
 test('Slider', async ({ page }) => {
-  await page.goto('https://demoqa.com/');
-  await page.getByRole('heading', { name: 'Widgets' }).click();
-  await page.getByText('Widgets').click();
-  await page.getByText('Widgets').click();
-  await page.getByText('Slider').click();
+  await page.goto('https://demoqa.com/slider');
   await expect(page.getByRole('heading', { name: 'Slider' })).toBeVisible();
   await page.getByRole('slider').fill('48');
 });
